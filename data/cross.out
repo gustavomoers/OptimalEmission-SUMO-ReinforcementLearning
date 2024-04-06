@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 2024-04-06 19:37:49 by Eclipse SUMO GUI Version 1.19.0
+<!-- generated on 2024-04-06 20:49:54 by Eclipse SUMO sumo Version 1.19.0
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
 
     <input>
-        <net-file value="F:\SUMO\OptimalEmission-SUMO-ReinforcementLearning\data/grid.net.xml"/>
-        <route-files value="F:\SUMO\OptimalEmission-SUMO-ReinforcementLearning\data/grid.rou.xml"/>
-        <additional-files value="F:\SUMO\OptimalEmission-SUMO-ReinforcementLearning\data/grid.det.xml"/>
+        <net-file value="F:/SUMO/OptimalEmission-SUMO-ReinforcementLearning/data/grid.net.xml"/>
+        <route-files value="F:/SUMO/OptimalEmission-SUMO-ReinforcementLearning/data/grid.rou.xml"/>
+        <additional-files value="F:/SUMO/OptimalEmission-SUMO-ReinforcementLearning/data/grid.det.xml"/>
     </input>
 
     <time>
@@ -18,8 +18,8 @@
         <time-to-teleport value="-1"/>
     </processing>
 
-</configuration>
--->
+    <traci_server>
+        <remote-port value="50815"/>
+    </traci_server>
 
-<detector xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/det_e2_file.xsd">
-</detector>
+</configuration>

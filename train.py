@@ -26,8 +26,8 @@ def simulation_loop():
 
     env= SpeedLimitEnv()
     env = Monitor(env, logdir)
-    env = DummyVecEnv(env)
-    env = VecNormalize(env)
+    # env = DummyVecEnv(env)
+    # env = VecNormalize(env)
 
     model = PPO('MlpPolicy', env, verbose=2, tensorboard_log=logdir)
 

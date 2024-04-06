@@ -1,12 +1,11 @@
 from stable_baselines3 import PPO #PPO
 from TrafficEnv import SpeedLimitEnv
 import time
-from stable_baselines3 import PPO #PPO
 import os
 from stable_baselines3.common.callbacks import CallbackList
 from callbacks import *
+from stable_baselines3.common.vec_env import VecNormalize, DummyVecEnv
 from stable_baselines3.common.monitor import Monitor
-
 
 
 logdir = f"logs/{int(time.time())}/"
@@ -27,6 +26,8 @@ def simulation_loop():
 
     env= SpeedLimitEnv()
     env = Monitor(env, logdir)
+    env = DummyVecEnv(env)
+    env = VecNormalize(env)
 
     model = PPO('MlpPolicy', env, verbose=2, tensorboard_log=logdir)
 

@@ -32,7 +32,7 @@ class SpeedLimitEnv(gym.Env):
 
 
         # SUMO simulation set up
-        self.simulation_dir = 'F:/SUMO/sumo-grid/'
+        self.simulation_dir = 'F:/SUMO/OptimalEmission-SUMO-ReinforcementLearning/'
 
         for f in os.listdir(self.simulation_dir):
             if f.endswith('.sumocfg'):
@@ -75,7 +75,7 @@ class SpeedLimitEnv(gym.Env):
 
         truncated=False
         self.counter += 1 
-        if self.counter > 200:
+        if self.counter > 10000:
             truncated = True
             # self.close()
 

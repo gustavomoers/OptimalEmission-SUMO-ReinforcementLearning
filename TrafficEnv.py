@@ -22,13 +22,13 @@ class SpeedLimitEnv(gym.Env):
         # observation space (total small vehicles, total large vehicles, average speed, occupancy (length of cars/lenght of roads), total emission)
         self.observation_space = spaces.Box(low=np.array([0, 0, 0, 0, 0]), high=np.array([400, 400, 28, 100, 100]), dtype=np.float32)
         
-        # Initialize state 
+        # Initialize state and other variables
         self.state = np.array([0,0,0,0,0])
-        emissions = 0
-        occupancy = 0
-        mean_speed = 0
-        total_cars = 0
-        total_trucks = 0
+        self.tot_emissions = 0
+        self.occupancy = 0
+        self.mean_speed = 0
+        self.total_cars = 0
+        self.total_trucks = 0
 
 
         # SUMO simulation set up
@@ -38,7 +38,7 @@ class SpeedLimitEnv(gym.Env):
             if f.endswith('.sumocfg'):
                 self._SUMOCFG = os.path.join(self.simulation_dir, f)
         
-        self.sumo_binary = os.path.join(os.environ['SUMO_HOME'], 'bin', 'sumo')
+        self.sumo_binary = os.path.join(os.environ['SUMO_HOME'], 'bin', 'sumo-gui')
         self.sumo_cmd = [self.sumo_binary, "-c", self._SUMOCFG]
 
         # Star simulation
@@ -50,10 +50,16 @@ class SpeedLimitEnv(gym.Env):
 
         self.close()
         traci.start(self.sumo_cmd)
-        self.state = np.array(self.get_state(), dtype='float32')
+        
   
 
-        self.counter = 0  
+        self.counter = 0 
+
+        while self.counter < 200:
+            traci.simulationStep()
+            self.counter += 1 
+
+        self.state = np.array(self.get_state(), dtype='float32') 
 
         return self.state, {}
     
@@ -75,7 +81,7 @@ class SpeedLimitEnv(gym.Env):
 
         truncated=False
         self.counter += 1 
-        if self.counter > 10000:
+        if self.counter > 4500:
             truncated = True
             # self.close()
 
@@ -93,8 +99,8 @@ class SpeedLimitEnv(gym.Env):
         lane_length_sum = 0
         mean_speed_sum = 0
         occupancy_sum = 0
-        mean_speed = 0
-        occupancy = 0
+        self.mean_speed = 0
+        self.occupancy = 0
 
         lanes = traci.lane.getIDList()
 
@@ -106,8 +112,8 @@ class SpeedLimitEnv(gym.Env):
             occupancy_sum += traci.lane.getLastStepOccupancy(lane) #%
 
 
-        mean_speed = mean_speed_sum/number_of_lanes
-        occupancy = (occupancy_sum/number_of_lanes)*100
+        self.mean_speed = mean_speed_sum/number_of_lanes
+        self.occupancy = (occupancy_sum/number_of_lanes)*100
 
         vehicles = emissions.get_all_vehicles()
         veh_types = []
@@ -115,14 +121,14 @@ class SpeedLimitEnv(gym.Env):
         for vehicle in vehicles:
             veh_types.append(vehicle.type)
 
-        total_cars = Counter(veh_types)['normal'] + Counter(veh_types)['sporty']
-        total_trucks = Counter(veh_types)['coach'] + Counter(veh_types)['trailer']
+        self.total_cars = Counter(veh_types)['normal'] + Counter(veh_types)['sporty']
+        self.total_trucks = Counter(veh_types)['coach'] + Counter(veh_types)['trailer']
 
-        tot_emissions = self.get_emission()
+        self.tot_emissions = self.get_emission()
 
-        print([total_cars, total_trucks, mean_speed, occupancy, tot_emissions])
+        print([self.total_cars, self.total_trucks, self.mean_speed, self.occupancy, self.tot_emissions])
 
-        return [total_cars, total_trucks, mean_speed, occupancy, tot_emissions]
+        return [self.total_cars, self.total_trucks, self.mean_speed, self.occupancy, self.tot_emissions]
     
 
 

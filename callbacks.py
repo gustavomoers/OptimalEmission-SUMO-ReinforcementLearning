@@ -16,6 +16,10 @@ class TensorboardCallback(BaseCallback):
 
     def _on_step(self) -> bool:                
         self.logger.record('reward', self.training_env.get_attr('reward')[0])
+        self.logger.record('total_cars', self.training_env.get_attr('total_cars')[0])
+        self.logger.record('total_trucks', self.training_env.get_attr('total_trucks')[0])
+        self.logger.record('mean_speed', self.training_env.get_attr('mean_speed')[0])
+        self.logger.record('occupancy', self.training_env.get_attr('occupancy')[0])
         self.logger.dump(self.num_timesteps)
 
         return True

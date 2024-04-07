@@ -8,7 +8,7 @@
     </input>
     <time>
         <begin value="0"/>
-        <end value="5000"/>
+        <end value="500000"/>
     </time>
     <time-to-teleport value="-1"/>
 </configuration>

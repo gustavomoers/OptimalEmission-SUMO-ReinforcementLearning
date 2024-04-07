@@ -2,14 +2,12 @@ from stable_baselines3 import PPO #PPO
 from TrafficEnv import SpeedLimitEnv
 import time
 import os
-from stable_baselines3.common.callbacks import CallbackList
-from callbacks import *
 from stable_baselines3.common.vec_env import VecNormalize, DummyVecEnv
 from stable_baselines3.common.monitor import Monitor
-from stable_baselines3.common.callbacks import CheckpointCallback
+from stable_baselines3.common.evaluation import evaluate_policy
 
-
-logdir = f"logs/{int(time.time())}/"
+run = '1712439915'
+logdir = f"logs/{run}/evaluation/"
 
 
 if not os.path.exists(logdir):
@@ -20,25 +18,17 @@ if not os.path.exists(logdir):
 def simulation_loop(): 
 
 
-    # Create Callback
-    save_callback = SaveOnBestTrainingRewardCallback(check_freq=100, log_dir=logdir, verbose=1) 
-    tensor = TensorboardCallback()
-    checkpoint = CheckpointCallback(save_freq=500, save_path=logdir, verbose=1 )  
-
 
     env= SpeedLimitEnv()
     env = Monitor(env, logdir)
     env = DummyVecEnv([lambda: env])
     env = VecNormalize(env)
+    env.training = False
+    env.norm_reward = False
 
-    model = PPO('MlpPolicy', env, verbose=2, tensorboard_log=logdir)
+    model = PPO.load(f"F:/SUMO/OptimalEmission-SUMO-ReinforcementLearning/logs/{run}/best_model.zip", env=env, print_system_info=True)
 
-    TIMESTEPS = 500000 
-    model.learn(total_timesteps=TIMESTEPS, reset_num_timesteps=False, tb_log_name=f"PPO", progress_bar=True, 
-                    callback = CallbackList([tensor, save_callback, checkpoint])) 
-                
-
-
+    mean_reward, std_reward = evaluate_policy(model, model.get_env(), n_eval_episodes=30)
 
 # ==============================================================================
 # -- main() --------------------------------------------------------------------

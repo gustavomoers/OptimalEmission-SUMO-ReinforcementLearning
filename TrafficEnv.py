@@ -36,10 +36,14 @@ class SpeedLimitEnv(gym.Env):
         self.simulation_dir = 'C:/Users/Admin/Documents/Dávid/Egyetem/Mester/3.felev/TraficControl/Git_Repo/OptimalEmission-SUMO-ReinforcementLearning'
 
         for f in os.listdir(self.simulation_dir):
-            if f.endswith('.sumocfg'):
+            # if f.endswith('.sumocfg'):
+            #     print(f)
+            #     self._SUMOCFG = os.path.join(self.simulation_dir, f)
+            if f.endswith('rnd.sumocfg'):
+                print(f)
                 self._SUMOCFG = os.path.join(self.simulation_dir, f)
         
-        self.sumo_binary = os.path.join(os.environ['SUMO_HOME'], 'bin', 'sumo-gui')      # with gui -> open sumo
+        self.sumo_binary = os.path.join(os.environ['SUMO_HOME'], 'bin', 'sumo')      # with gui (sumo-gui) -> open sumo
         self.sumo_cmd = [self.sumo_binary, "-c", self._SUMOCFG]
 
         # Star simulation
@@ -121,7 +125,7 @@ class SpeedLimitEnv(gym.Env):
 
         for vehicle in vehicles:
             veh_types.append(vehicle.type)
-            
+
 
         self.total_cars = Counter(veh_types)['normal'] + Counter(veh_types)['sporty']
         self.total_trucks = Counter(veh_types)['coach'] + Counter(veh_types)['trailer']

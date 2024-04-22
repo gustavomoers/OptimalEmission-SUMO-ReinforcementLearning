@@ -1,3 +1,4 @@
+# The Environment
 import gymnasium as gym
 from gymnasium import spaces
 import numpy as np
@@ -16,7 +17,7 @@ class SpeedLimitEnv(gym.Env):
         # action space (discrete speed limits between 40 km/h and 100 km/h, in 10 km/h increments)
         self.action_space = spaces.Discrete(7)  # 7 options: 40, 50, ..., 100
 
-        # self.action_space = spaces.Box(low=-1, high=1,shape=(1,),dtype="float32")
+        # self.action_space = spaces.Box(low=-1, high=1,shape=(1,),dtype=Users"float32")
 
         
         # observation space (total small vehicles, total large vehicles, average speed, occupancy (length of cars/lenght of roads), total emission)
@@ -32,13 +33,13 @@ class SpeedLimitEnv(gym.Env):
 
 
         # SUMO simulation set up
-        self.simulation_dir = 'F:/SUMO/OptimalEmission-SUMO-ReinforcementLearning/'
+        self.simulation_dir = 'C:/Users/Admin/Documents/Dávid/Egyetem/Mester/3.felev/TraficControl/Git_Repo/OptimalEmission-SUMO-ReinforcementLearning'
 
         for f in os.listdir(self.simulation_dir):
             if f.endswith('.sumocfg'):
                 self._SUMOCFG = os.path.join(self.simulation_dir, f)
         
-        self.sumo_binary = os.path.join(os.environ['SUMO_HOME'], 'bin', 'sumo-gui')
+        self.sumo_binary = os.path.join(os.environ['SUMO_HOME'], 'bin', 'sumo-gui')      # with gui -> open sumo
         self.sumo_cmd = [self.sumo_binary, "-c", self._SUMOCFG]
 
         # Star simulation
@@ -120,6 +121,7 @@ class SpeedLimitEnv(gym.Env):
 
         for vehicle in vehicles:
             veh_types.append(vehicle.type)
+            
 
         self.total_cars = Counter(veh_types)['normal'] + Counter(veh_types)['sporty']
         self.total_trucks = Counter(veh_types)['coach'] + Counter(veh_types)['trailer']

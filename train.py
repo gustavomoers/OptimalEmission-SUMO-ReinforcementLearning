@@ -22,7 +22,7 @@ def simulation_loop():
 
     # Create Callback
     save_callback = SaveOnBestTrainingRewardCallback(check_freq=100, log_dir=logdir, verbose=1) 
-    tensor = TensorboardCallback()
+    tensor = TensorboardCallback()                                                                  # 
     checkpoint = CheckpointCallback(save_freq=500, save_path=logdir, verbose=1 )  
 
 
@@ -31,10 +31,10 @@ def simulation_loop():
     env = DummyVecEnv([lambda: env])
     env = VecNormalize(env)
 
-    model = PPO('MlpPolicy', env, verbose=2, tensorboard_log=logdir)
+    model = PPO('MlpPolicy', env, verbose=2, tensorboard_log=logdir)  # pass the env to model
 
     TIMESTEPS = 500000 
-    model.learn(total_timesteps=TIMESTEPS, reset_num_timesteps=False, tb_log_name=f"PPO", progress_bar=True, 
+    model.learn(total_timesteps=TIMESTEPS, reset_num_timesteps=False, tb_log_name=f"PPO", progress_bar=False, 
                     callback = CallbackList([tensor, save_callback, checkpoint])) 
                 
 

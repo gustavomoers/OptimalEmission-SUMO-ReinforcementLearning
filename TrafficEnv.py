@@ -16,7 +16,7 @@ class SpeedLimitEnv(gym.Env):
         # action space (discrete speed limits between 40 km/h and 100 km/h, in 10 km/h increments)
         self.action_space = spaces.Discrete(7)  # 7 options: 40, 50, ..., 100
 
-        # self.action_space = spaces.Box(low=-1, high=1,shape=(1,),dtype="float32")
+        # self.action_space = spaces.Box(low=40, high=100,shape=(1,),dtype="float32")
 
         
         # observation space (total small vehicles, total large vehicles, average speed, occupancy (length of cars/lenght of roads), total emission)

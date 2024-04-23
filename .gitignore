@@ -1,4 +1,3 @@
-logs/
 weights/
 runs/
 models/
@@ -10,5 +9,7 @@ Controller/__pycache__/
 Utils/__pycache__/
 .venv/
 plotting/
+*.zip
+
 
 

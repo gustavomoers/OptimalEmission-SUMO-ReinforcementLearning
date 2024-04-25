@@ -11,8 +11,14 @@ import random
 
 class SpeedLimitEnv(gym.Env):
     """A simple traffic simulation environment for adjusting speed limits to minimize emissions."""
-    def __init__(self):
+    def __init__(self, visuals=False):
         super().__init__()
+
+        # whether to open sumo gui or not
+        if visuals:
+            self.visuals = 'sumo-gui'
+        else:
+            self.visuals = 'sumo'
         
         # action space (discrete speed limits between 40 km/h and 100 km/h, in 10 km/h increments)
         self.action_space = spaces.Discrete(7)  # 7 options: 40, 50, ..., 100
@@ -166,7 +172,7 @@ class SpeedLimitEnv(gym.Env):
             if f.endswith('.sumocfg'):
                 self._SUMOCFG = os.path.join(scenario, f)
         
-        self.sumo_binary = os.path.join(os.environ['SUMO_HOME'], 'bin', 'sumo')
+        self.sumo_binary = os.path.join(os.environ['SUMO_HOME'], 'bin', self.visuals)
         self.sumo_cmd = [self.sumo_binary, "-c", self._SUMOCFG]
 
         # Star simulation

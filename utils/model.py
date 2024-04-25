@@ -51,7 +51,7 @@ class Vehicle:
     The Vehicle class defines a vehicle object
     """
 
-    def __init__(self, veh_id: int, pos: Tuple[float, float], tipo):
+    def __init__(self, veh_id: int, pos: Tuple[float, float], tipo, vel, classe):
         """
         Vehicle constructor
         :param veh_id: The vehicle ID
@@ -61,6 +61,8 @@ class Vehicle:
         self.veh_id = veh_id
         self.pos = Point(pos)
         self.type = tipo
+        self.speed = vel
+        self.classe = classe
 
     def __repr__(self) -> str:
         """

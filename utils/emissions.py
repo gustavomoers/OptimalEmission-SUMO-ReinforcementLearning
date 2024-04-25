@@ -28,7 +28,9 @@ def get_all_vehicles() -> List[Vehicle]:
     for veh_id in traci.vehicle.getIDList():
         veh_pos = traci.vehicle.getPosition(veh_id)
         veh_type = traci.vehicle.getTypeID(veh_id)
-        vehicle = Vehicle(veh_id, veh_pos, veh_type)
+        veh_speed = traci.vehicle.getSpeed(veh_id)
+        emission_class = traci.vehicle.getEmissionClass(veh_id)
+        vehicle = Vehicle(veh_id, veh_pos, veh_type, veh_speed, emission_class)
         vehicle.emissions = compute_vehicle_emissions(veh_id)
         vehicles.append(vehicle)
     return vehicles

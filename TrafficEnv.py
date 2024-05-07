@@ -165,7 +165,7 @@ class SpeedLimitEnv(gym.Env):
 
         # SUMO simulation set up
         # scenario = random.choice(self.dirs)
-        scenario = self.dirs[3]
+        scenario = self.dirs[5]
         print(f'selected network: {scenario}')
 
         for f in os.listdir(scenario):

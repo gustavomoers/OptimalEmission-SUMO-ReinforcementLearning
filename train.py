@@ -31,6 +31,7 @@ def simulation_loop():
     env = DummyVecEnv([lambda: env])
     env = VecNormalize(env)
 
+
     model = PPO('MlpPolicy', env, verbose=2, tensorboard_log=logdir)
 
     TIMESTEPS = 500000 

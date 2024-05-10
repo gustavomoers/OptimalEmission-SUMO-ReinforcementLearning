@@ -79,6 +79,7 @@ class SpeedLimitEnv(gym.Env):
         """Execute one time step within the environment."""
 
         self.set_speed_limit(action)
+        traci.simulation.setScale(random.randint(2,20))
 
         traci.simulationStep()
 
@@ -122,7 +123,7 @@ class SpeedLimitEnv(gym.Env):
         self.mean_speed = sum(veh_speeds) / (len(veh_speeds)+0.00001)
         print(self.mean_speed)
 
-        total = total_emissions.co2 + total_emissions.co + total_emissions.nox + total_emissions.hc + total_emissions.pmx
+        total = total_emissions.co2 #+ total_emissions.co + total_emissions.nox + total_emissions.hc + total_emissions.pmx
         self.tot_emissions = total/1000000
 
         # print([self.total_cars, self.total_trucks, self.mean_speed, self.tot_emissions])
@@ -165,7 +166,7 @@ class SpeedLimitEnv(gym.Env):
 
         # SUMO simulation set up
         # scenario = random.choice(self.dirs)
-        scenario = self.dirs[5]
+        scenario = self.dirs[1]
         print(f'selected network: {scenario}')
 
         for f in os.listdir(scenario):
@@ -177,5 +178,6 @@ class SpeedLimitEnv(gym.Env):
 
         # Star simulation
         traci.start(self.sumo_cmd)
+        
 
         

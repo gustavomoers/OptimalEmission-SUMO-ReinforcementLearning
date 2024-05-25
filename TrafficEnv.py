@@ -27,10 +27,11 @@ class SpeedLimitEnv(gym.Env):
 
         
         # observation space (total small vehicles, total large vehicles, average speed, occupancy (length of cars/lenght of roads), total emission)
-        self.observation_space = spaces.Box(low=np.array([-np.inf, -np.inf, -np.inf, -np.inf]), high=np.array([np.inf, np.inf, np.inf, np.inf]), dtype=np.float32)
+        self.observation_space = spaces.Box(low=np.array([-np.inf, -np.inf, -np.inf, -np.inf, -np.inf, -np.inf]),
+                                             high=np.array([np.inf, np.inf, np.inf, np.inf, np.inf, np.inf]), dtype=np.float32)
         
         # Initialize state and other variables
-        self.state = np.array([0,0,0,0])
+        self.state = np.array([0,0,0,0,0])
         self.tot_emissions = 0
         self.occupancy = 0
         self.mean_speed = 0
@@ -54,10 +55,6 @@ class SpeedLimitEnv(gym.Env):
 
         self.select_network()
 
-        # lanes = traci.lane.getIDList()
-        # for lane in lanes:
-        #     traci.lane.setMaxSpeed(lane, 40)
-
 
         self.counter = 0 
 
@@ -79,13 +76,16 @@ class SpeedLimitEnv(gym.Env):
         """Execute one time step within the environment."""
 
         self.set_speed_limit(action)
-        traci.simulation.setScale(random.randint(2,20))
+        # scale = random.randint(1,5)
+        # traci.simulation.setScale(scale)
+        # print(f'current scale: {scale}')
+
 
         traci.simulationStep()
 
        
         self.state = np.array(self.get_state(), dtype='float32')
-        self.reward = - self.state[3]
+        self.reward = - self.state[3] + (1/self.state[5])
 
         truncated=False
         self.counter += 1 
@@ -101,21 +101,34 @@ class SpeedLimitEnv(gym.Env):
 
     def get_state(self):
         """Gets the current state space = total small vehicles, total large vehicles, average speed, occupancy, total emission."""
-   
-        veh_types =[]
+
+        veh_types = []
         veh_speeds= []
+        veh_edges = []
         total_emissions = Emission()
         self.mean_speed = 0
+        self.occupancy = 0
+        occupancy_sum = 0
+        travel_time_sum = 0
+
 
         vehicles = emissions.get_all_vehicles()
         for vehicle in vehicles:
             veh_types.append(vehicle.type)
             veh_speeds.append(vehicle.speed)
+            veh_edges.append(vehicle.edge)
             total_emissions += vehicle.emissions
 
-        # print(veh_types)
-        # self.total_cars = Counter(veh_types)['motorcycle_motorcycle'] + Counter(veh_types)['veh_passenger']
-        # self.total_trucks = Counter(veh_types)['bus_bus'] + Counter(veh_types)['truck_truck']
+
+
+        for edge in veh_edges:
+            occupancy_sum += traci.edge.getLastStepOccupancy(edge) #%
+            travel_time_sum += traci.edge.getTraveltime(edge)
+
+        self.occupancy = (occupancy_sum/(len(veh_edges)+0.0001))*100
+        self.travel_time = (travel_time_sum/(len(veh_edges)+0.0001))
+
+
         self.total_cars = sum(1 for row in veh_types if row[0][0] == 'v' or row[0][0] == 'm')
         self.total_trucks = sum(1 for row in veh_types if row[0][0] == 't' or row[0][0] == 'b')
         print(self.total_cars+self.total_trucks)
@@ -128,23 +141,9 @@ class SpeedLimitEnv(gym.Env):
 
         # print([self.total_cars, self.total_trucks, self.mean_speed, self.tot_emissions])
 
-        return [self.total_cars, self.total_trucks, self.mean_speed, self.tot_emissions]
+        return [self.total_cars, self.total_trucks, self.mean_speed, self.tot_emissions, self.occupancy, self.travel_time]
     
 
-
-    # def get_emission(self):
-    #     """Gets the total emission on the current state"""
-
-    #     vehicles = emissions.get_all_vehicles()
-    #     total_emissions = Emission()
-    
-    #     for vehicle in vehicles:
-    #         total_emissions += vehicle.emissions
-
-    #     total = total_emissions.co2 + total_emissions.co + total_emissions.nox + total_emissions.hc + total_emissions.pmx
-
-    #     return total/1000000
-    
     
     def set_speed_limit(self, action):
         """Sets the current speed limit on the network"""
@@ -166,7 +165,7 @@ class SpeedLimitEnv(gym.Env):
 
         # SUMO simulation set up
         # scenario = random.choice(self.dirs)
-        scenario = self.dirs[1]
+        scenario = self.dirs[8]
         print(f'selected network: {scenario}')
 
         for f in os.listdir(scenario):
@@ -178,6 +177,4 @@ class SpeedLimitEnv(gym.Env):
 
         # Star simulation
         traci.start(self.sumo_cmd)
-        
-
         

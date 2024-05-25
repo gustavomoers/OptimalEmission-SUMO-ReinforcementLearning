@@ -26,7 +26,7 @@ def simulation_loop():
     checkpoint = CheckpointCallback(save_freq=500, save_path=logdir, verbose=1 )  
 
 
-    env= SpeedLimitEnv()
+    env= SpeedLimitEnv(visuals=True)
     env = Monitor(env, logdir)
     env = DummyVecEnv([lambda: env])
     env = VecNormalize(env)
@@ -34,7 +34,7 @@ def simulation_loop():
 
     model = PPO('MlpPolicy', env, verbose=2, tensorboard_log=logdir)
 
-    TIMESTEPS = 500000 
+    TIMESTEPS = 60000 
     model.learn(total_timesteps=TIMESTEPS, reset_num_timesteps=False, tb_log_name=f"PPO", progress_bar=True, 
                     callback = CallbackList([tensor, save_callback, checkpoint])) 
                 

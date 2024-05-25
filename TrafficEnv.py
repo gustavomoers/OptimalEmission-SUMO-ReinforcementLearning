@@ -27,10 +27,11 @@ class SpeedLimitEnv(gym.Env):
 
         
         # observation space (total small vehicles, total large vehicles, average speed, occupancy (length of cars/lenght of roads), total emission)
-        self.observation_space = spaces.Box(low=np.array([-np.inf, -np.inf, -np.inf, -np.inf]), high=np.array([np.inf, np.inf, np.inf, np.inf]), dtype=np.float32)
+        self.observation_space = spaces.Box(low=np.array([-np.inf, -np.inf, -np.inf, -np.inf, -np.inf]),
+                                             high=np.array([np.inf, np.inf, np.inf, np.inf, np.inf]), dtype=np.float32)
         
         # Initialize state and other variables
-        self.state = np.array([0,0,0,0])
+        self.state = np.array([0,0,0,0,0])
         self.tot_emissions = 0
         self.occupancy = 0
         self.mean_speed = 0
@@ -103,14 +104,24 @@ class SpeedLimitEnv(gym.Env):
    
         veh_types =[]
         veh_speeds= []
+        veh_edges = []
         total_emissions = Emission()
         self.mean_speed = 0
+        occupancy_sum = 0
 
         vehicles = emissions.get_all_vehicles()
         for vehicle in vehicles:
             veh_types.append(vehicle.type)
             veh_speeds.append(vehicle.speed)
             total_emissions += vehicle.emissions
+            veh_edges.append(vehicle.edge)
+
+
+        for edge in veh_edges:
+            occupancy_sum += traci.edge.getLastStepOccupancy(edge) #%
+            travel_time_sum += traci.edge.getTraveltime(edge)
+
+        self.occupancy = (occupancy_sum/(len(veh_edges)+0.0001))*100
 
         # print(veh_types)
         # self.total_cars = Counter(veh_types)['motorcycle_motorcycle'] + Counter(veh_types)['veh_passenger']
@@ -127,23 +138,10 @@ class SpeedLimitEnv(gym.Env):
 
         # print([self.total_cars, self.total_trucks, self.mean_speed, self.tot_emissions])
 
-        return [self.total_cars, self.total_trucks, self.mean_speed, self.tot_emissions]
+        return [self.total_cars, self.total_trucks, self.mean_speed, self.tot_emissions, self.occupancy]
     
 
 
-    # def get_emission(self):
-    #     """Gets the total emission on the current state"""
-
-    #     vehicles = emissions.get_all_vehicles()
-    #     total_emissions = Emission()
-    
-    #     for vehicle in vehicles:
-    #         total_emissions += vehicle.emissions
-
-    #     total = total_emissions.co2 + total_emissions.co + total_emissions.nox + total_emissions.hc + total_emissions.pmx
-
-    #     return total/1000000
-    
     
     def set_speed_limit(self, action):
         """Sets the current speed limit on the network"""
